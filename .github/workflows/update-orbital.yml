@@ -1,7 +1,7 @@
-name: Update public orbital snapshot
+name: Update public orbital snapshots
 on:
   schedule:
-    # Once daily: deliberately conservative, below CelesTrak's published update cadence.
+    # Daily low-volume collection; source-specific cadence and limits are documented.
     - cron: "17 7 * * *"
   workflow_dispatch:
 permissions:
@@ -15,13 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/dashboard-v1-1
+          # Follow the branch on which this workflow was dispatched.
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Retrieve and archive one STATIONS OMM dataset
+      - name: Retrieve and archive public orbital datasets
         run: python scripts/update_orbital_snapshot.py
-      - name: Commit changed snapshot and source log
+      - name: Commit changed snapshots and source log
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -29,6 +30,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "data: archive daily CelesTrak STATIONS snapshot"
-            git push origin HEAD:feature/dashboard-v1-1
+            git commit -m "data: archive public orbital source snapshots"
+            git push origin "HEAD:${{ github.ref_name }}"
           fi

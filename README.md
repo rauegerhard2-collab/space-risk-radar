@@ -7,7 +7,7 @@ Independent public information project for understanding the orbital environment
 
 ## Project status
 
-The project is a public-information prototype, not an operational collision-warning service. The current dashboard preview is being developed on the branch `feature/dashboard-v1-1`. The public `main` branch remains unchanged until the preview has been reviewed and approved for publication.
+The interactive v1.2 dashboard is under review in draft PR #2. The public `main` branch and Pages site remain unchanged until explicit approval and merge.
 
 ## Scope
 
@@ -17,33 +17,28 @@ The project is a public-information prototype, not an operational collision-warn
 - Public collision-avoidance information, where evidence is available
 - Source transparency, data quality labels and explicit gaps
 
-The first release is intentionally neutral and independent. It does not represent Deutsche Telekom AG, ESA, or any other organization.
+The project is independent and does not represent Deutsche Telekom AG, ESA or another organization.
 
 ## Data principles
 
 1. Keep observed/catalogued values separate from modelled estimates.
-2. Preserve each source's reference date and definition.
+2. Preserve each source's reference date, retrieval time and definition.
 3. Do not interpolate missing months or manufacture event records.
 4. Distinguish conjunction warnings, operator risk assessments and executed avoidance manoeuvres.
-5. Record source URLs and retrieval dates for every maintained dataset.
-6. Make uncertainty and known coverage gaps visible.
+5. Record source URLs, attribution and retrieval dates for every maintained dataset.
+6. Make uncertainty, coverage gaps and source dependencies visible.
 
-## Repository layout (target)
+## Automated data retrieval
 
-- `index.html` — dashboard interface
-- `data/metrics.json` and `data/history/` — curated metric baseline and dated history
-- `data/orbital/` — date-stamped CelesTrak OMM snapshots (STATIONS pilot)
-- `data/source-log.jsonl` — machine-readable retrieval log
-- `scripts/` — validation and data ingestion scripts
-- `.github/workflows/` — automated validation and scheduled retrieval
-- `docs/` — source register, feed assessment and historical-data policy
-- `CHANGELOG.md` — project changes
+The daily workflow now follows the branch on which it is dispatched and no longer targets the retired `feature/dashboard-v1-1` branch.
 
-## Current data limitation
+- CelesTrak STATIONS OMM is the required orbital-element pilot.
+- OrbitalWiki catalogue events and launch metadata are optional enrichment feeds.
+- OrbitalWiki's elements endpoint is excluded because it republishes CelesTrak-derived orbital elements.
+- Orbital Watch Collision Watch is documented as a public CDM reference, but is not scraped without a stable supported API/export contract.
+- SatNOGS DB, ESA DISCOSweb and Space-Track remain candidates subject to data-type, access, licensing and redistribution review.
 
-ESA's Space Debris User Portal summary currently reports approximately 47,280 catalogued objects (updated 2 November 2026). Its detailed object-by-orbit table displays a total of 47,290. This 10-object difference is preserved as a source discrepancy and must not be silently reconciled. The dashboard uses the portal's headline summary and flags the detailed-table difference in the structured data record.
-
-ESA's MASTER-8 reference population (February 2026) estimates 68,450 objects larger than 10 cm, approximately 1.5 million objects from greater than 1 cm to 10 cm, and approximately 230 million from greater than 1 mm to 1 cm. These are model estimates, not catalogue counts.
+See [feed assessment](docs/FEED_ASSESSMENT.md), [data sources](docs/DATA_SOURCES.md) and [orbital archive notes](data/orbital/README.md).
 
 ## Development
 
