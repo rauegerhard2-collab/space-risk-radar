@@ -29,9 +29,16 @@ def fetch_json(url):
     with urllib.request.urlopen(req, timeout=60) as response:
         if response.status != 200:
             raise RuntimeError(f"HTTP {response.status}")
-        payload = json.loads(response.read().decode("utf-8"))
+        body = response.read().decode("utf-8")
+        payload = json.loads(body)
     if not isinstance(payload, (dict, list)) or not payload:
         raise ValueError("Unexpected or empty JSON payload")
+    # OrbitalWiki list endpoints currently return a JSON envelope. Accept
+    # documented envelope variants, but reject structurally empty responses.
+    if isinstance(payload, dict) and "data" in payload:
+        data = payload["data"]
+        if not isinstance(data, (dict, list)) or not data:
+            raise ValueError("JSON envelope contains empty or invalid data")
     return payload
 
 def write_json(path, payload):
@@ -107,7 +114,8 @@ def main():
             folder = orbital_dir / dataset
             write_json(folder / "snapshots" / f"{stamp}.json", envelope)
             write_json(folder / "latest.json", envelope)
-            count = len(payload) if isinstance(payload, list) else len(payload.get("data", [])) if isinstance(payload.get("data"), list) else None
+            data = payload.get("data", payload) if isinstance(payload, dict) else payload
+            count = len(data) if isinstance(data, (list, dict)) else None
             append_log({
                 "retrieved_at": retrieved_at, "source": "OrbitalWiki API",
                 "dataset": dataset, "record_count": count,
@@ -115,7 +123,7 @@ def main():
                 "note": "Complementary catalogue metadata; not an independent orbital-element or collision-warning feed.",
             })
             print(f"Archived OrbitalWiki {dataset} feed.")
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, ValueError, RuntimeError) as exc:
             append_log({
                 "retrieved_at": retrieved_at, "source": "OrbitalWiki API",
                 "dataset": dataset, "record_count": None,

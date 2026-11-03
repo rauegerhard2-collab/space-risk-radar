@@ -40,6 +40,19 @@ footer{margin:22px 0 0;padding:20px 0 30px;border-top:1px solid var(--line);colo
 .chart-point{cursor:pointer}.chart-point:focus{outline:none;stroke:var(--cyan);stroke-width:4}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 
+
+.source-health{margin:4px 0 16px;padding:14px;background:#0b1524;border:1px solid #2b405c;border-radius:10px}
+.health-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
+.health-head b{display:block;font-size:12px}.health-head span,.health-foot{display:block;color:var(--muted);font-size:10px}
+.health-head button{border:1px solid var(--line);background:#142238;color:var(--cyan);padding:7px 10px;border-radius:7px;font:inherit;font-size:10px;cursor:pointer}
+.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.health-card{padding:11px;background:#111e30;border:1px solid #2a3d57;border-radius:8px;min-width:0}
+.health-card b{display:flex;align-items:center;gap:7px;font-size:11px;margin-bottom:6px}
+.health-card p{margin:3px 0;color:var(--muted);font-size:10px;overflow-wrap:anywhere}
+.health-state{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none}
+.health-state.ok{background:var(--green)}.health-state.fail{background:var(--red)}.health-state.stale{background:var(--amber)}
+.health-foot{margin:10px 0 0}
+@media(max-width:700px){.health-grid{grid-template-columns:1fr}.health-head{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -93,6 +106,11 @@ footer{margin:22px 0 0;padding:20px 0 30px;border-top:1px solid var(--line);colo
 <div class="source"><a href="https://www.sdo.esoc.esa.int/publications/Space_Environment_Report_I10R0_20260501.pdf" target="_blank" rel="noopener">ESA Report 2026 · PDF ↗</a><p>Originalbericht, Ausgabe vom 01.05.2026. Einzelne Abschnitte können durch spätere Aktualisierungen ergänzt werden.</p></div>
 <div class="source"><a href="https://orbitalwatch.app/collision-watch" target="_blank" rel="noopener">Orbital Watch – Collision Watch ↗</a><p>Beispiel für öffentlich zugängliche Annäherungsinformationen; keine vollständige globale Datenbasis.</p></div>
 </div>
+<div class="source-health" id="source-health" aria-live="polite">
+<div class="health-head"><div><b>Live-Status der Datenabrufe</b><span>Automatisch aus dem versionierten Abrufprotokoll · Zeiten in UTC</span></div><button type="button" id="refresh-source-health">Status aktualisieren</button></div>
+<div class="health-grid" id="health-grid"><div class="health-card"><b>Abrufprotokoll wird geladen …</b><span>Die tatsächlichen Abrufzeiten und Datensatzmengen werden geprüft.</span></div></div>
+<p class="health-foot" id="health-foot">Ein erfolgreicher Abruf bestätigt nur die Verfügbarkeit und Struktur des jeweiligen Feeds – nicht die Vollständigkeit der globalen Weltraumlage.</p>
+</div>
 <div style="height:15px"></div><div class="quality"><div><b><span class="badge">OBSERVED / CATALOGUED</span></b><span>Beobachtet oder in einem Überwachungskatalog geführt. Stichtag und Quelle nennen.</span></div><div><b><span class="badge amber">MODELLED</span></b><span>Statistische Populationsschätzung. Modell, Größenbereich und Referenzdatum nennen.</span></div><div><b><span class="badge pink">DERIVED</span></b><span>Aus anderen Werten abgeleitet. Formel, Eingaben und Unsicherheit offenlegen.</span></div></div>
 <p class="sub" style="margin:14px 0 0">Qualitätsregeln: keine Interpolation fehlender Monate · Warnung, Risikoprüfung und Manöver getrennt halten · Ereignisse deduplizieren · Quellen- und Aktualisierungsdatum pro Datenpunkt dokumentieren · Unsicherheiten sichtbar kennzeichnen.</p>
 </section>
@@ -128,6 +146,54 @@ document.querySelectorAll("[data-layer]").forEach(input=>input.addEventListener(
  document.querySelectorAll('[data-orbit-layer="'+layer+'"]').forEach(el=>el.style.display=visible?"":"none");
 }));
 
+
+
+async function loadSourceHealth(){
+ const grid=document.getElementById("health-grid"),foot=document.getElementById("health-foot");
+ grid.replaceChildren();
+ try{
+  const response=await fetch("data/source-log.jsonl?ts="+Date.now(),{cache:"no-store"});
+  if(!response.ok)throw new Error("Abrufprotokoll HTTP "+response.status);
+  const raw=await response.text();
+  const entries=raw.split(/\\r?\\n/).filter(Boolean).map(line=>JSON.parse(line));
+  const feeds=[
+   {id:"STATIONS",name:"CelesTrak · STATIONS OMM",kind:"Bahnelemente",maxAge:36*3600},
+   {id:"orbitalwiki-events",name:"OrbitalWiki · Katalogereignisse",kind:"Katalog-Metadaten",maxAge:48*3600},
+   {id:"orbitalwiki-launches",name:"OrbitalWiki · Starts",kind:"Start-Metadaten",maxAge:48*3600}
+  ];
+  for(const feed of feeds){
+   const matches=entries.filter(e=>e.dataset===feed.id);
+   const latest=matches[matches.length-1];
+   const previousSuccess=[...matches].reverse().find(e=>e.status==="success");
+   const age=latest?.retrieved_at?Math.max(0,(Date.now()-Date.parse(latest.retrieved_at))/1000):Infinity;
+   let state="Noch kein Abruf",cls="stale",detail="Für diesen Feed liegt noch kein protokollierter Lauf vor.";
+   if(latest){
+    if(latest.status==="success"&&age<=feed.maxAge){state="Aktuell · Abruf erfolgreich";cls="ok"}
+    else if(latest.status==="success"){state="Veraltet · letzter Abruf zu alt";cls="stale"}
+    else {state="Letzter Lauf fehlgeschlagen";cls="fail"}
+    const last=previousSuccess||latest;
+    detail="Letzter Erfolg: "+(last.retrieved_at?new Date(last.retrieved_at).toLocaleString("de-DE",{timeZone:"UTC"})+" UTC":"unbekannt");
+    detail+=" · Datensätze: "+(last.record_count??"nicht ausgewiesen");
+    if(latest.status!=="success")detail+=" · Letzter Versuch: "+(latest.error||latest.status);
+   }
+   const card=document.createElement("article");card.className="health-card";
+   const heading=document.createElement("b"),dot=document.createElement("i");dot.className="health-state "+cls;
+   heading.append(dot,document.createTextNode(feed.name));
+   const kind=document.createElement("p");kind.textContent=feed.kind+" · "+state;
+   const info=document.createElement("p");info.textContent=detail;
+   card.append(heading,kind,info);grid.append(card);
+  }
+  foot.textContent="Quelle: data/source-log.jsonl · Ein erfolgreicher Abruf belegt Erreichbarkeit und grundlegende Datenstruktur, nicht Vollständigkeit, Unabhängigkeit oder operative Warnqualität.";
+ }catch(error){
+  const card=document.createElement("article");card.className="health-card";
+  const b=document.createElement("b");b.textContent="Status derzeit nicht verfügbar";
+  const p=document.createElement("p");p.textContent=String(error.message||error);
+  card.append(b,p);grid.append(card);
+  foot.textContent="Das Protokoll konnte nicht gelesen werden. Das ist kein Beleg dafür, dass die Datenquelle selbst ausgefallen ist.";
+ }
+}
+document.getElementById("refresh-source-health").addEventListener("click",loadSourceHealth);
+loadSourceHealth();
 
 document.querySelectorAll(".source").forEach(card=>{
  const link=card.querySelector("a"),description=card.querySelector("p");

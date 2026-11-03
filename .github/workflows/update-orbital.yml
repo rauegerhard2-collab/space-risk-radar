@@ -1,9 +1,15 @@
 name: Update public orbital snapshots
 on:
   schedule:
-    # Daily low-volume collection; source-specific cadence and limits are documented.
     - cron: "17 7 * * *"
   workflow_dispatch:
+  # Run a real integration check when the updater or its workflow changes on this branch.
+  push:
+    branches:
+      - feature/dashboard-v1-2-interactions
+    paths:
+      - ".github/workflows/update-orbital.yml"
+      - "scripts/update_orbital_snapshot.py"
 permissions:
   contents: write
 concurrency:
@@ -15,7 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Follow the branch on which this workflow was dispatched.
           ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v5
         with:
