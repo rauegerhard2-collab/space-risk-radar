@@ -31,8 +31,12 @@ The first release is intentionally neutral and independent. It does not represen
 ## Repository layout (target)
 
 - `index.html` — dashboard interface
-- `data/metrics.json` — curated public metric snapshots
-- `docs/DATA_SOURCES.md` — source register and interpretation notes
+- `data/metrics.json` and `data/history/` — curated metric baseline and dated history
+- `data/orbital/` — date-stamped CelesTrak OMM snapshots (STATIONS pilot)
+- `data/source-log.jsonl` — machine-readable retrieval log
+- `scripts/` — validation and data ingestion scripts
+- `.github/workflows/` — automated validation and scheduled retrieval
+- `docs/` — source register, feed assessment and historical-data policy
 - `CHANGELOG.md` — project changes
 
 ## Current data limitation
