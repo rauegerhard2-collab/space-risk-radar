@@ -12,6 +12,16 @@
 - Added project data-source and methodology notes.
 - Kept development on `feature/dashboard-v1-1`; public `main` branch not changed.
 
+## 1.2.0-dev — data pipeline foundation — 2026-11-03
+
+- Added automatic HTML/metric integrity checks and a GitHub Actions validation workflow.
+- Added a JSON Schema for curated metric snapshots.
+- Added an append-only historical-data policy and initial dated metric snapshot.
+- Added a machine-readable source retrieval log.
+- Added a conservative daily CelesTrak STATIONS OMM ingestion workflow with date-stamped archives and failure-safe validation.
+- Assessed CelesTrak, ESA DISCOSweb and Space-Track access, cadence, attribution and limitations.
+- Kept all changes on `feature/dashboard-v1-1`; public `main` remains unchanged.
+
 ## Planned next
 
 - Validate HTML and JSON automatically.
