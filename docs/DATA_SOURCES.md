@@ -50,3 +50,8 @@ This is a public information source for selected conjunction-related information
 `metric_id`, `value`, `unit`, `classification`, `reference_date`, `published_date`, `retrieved_at`, `source_name`, `source_url`, `definition`, `uncertainty_note`, `verification_status`.
 
 No missing month may be filled by interpolation unless a future analytical product explicitly labels such a transformation and explains its method. The default dashboard must show gaps as gaps.
+
+
+## Orbital element sources
+
+See [Feed assessment](FEED_ASSESSMENT.md). The initial automated pilot uses one daily CelesTrak STATIONS-group OMM JSON snapshot. It is a limited object group, not a global catalogue. See [orbital archive notes](../data/orbital/README.md). ESA DISCOS is considered for metadata only after registration and terms review; it does not distribute surveillance ephemerides. Space-Track CDM/API access requires separate account, rate-limit and redistribution review.
