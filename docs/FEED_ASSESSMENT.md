@@ -38,7 +38,12 @@ Orbital Watch publishes a public selected subset of conjunction information sour
 
 ### SatNOGS DB
 API documentation: https://docs.satnogs.org/projects/satnogs-db/en/latest/api.html  
-SatNOGS DB provides community-maintained satellite and transmitter metadata under CC BY-SA 4.0. This is useful for radio-frequency/transponder enrichment, not a source of precise orbital ephemerides or conjunction warnings. Candidate for a later, separately labelled metadata layer.
+Live API schema: https://db.satnogs.org/api/schema/docs/  
+About / data terms: https://db.satnogs.org/about/
+
+SatNOGS DB provides a public read API for community-maintained satellite and transmitter metadata. Its own documentation says API data are freely distributed under CC BY-SA; the project description identifies the data as volunteer-contributed. This is useful for radio-frequency/transponder enrichment, not a source of precise orbital ephemerides or conjunction warnings.
+
+**Decision:** approved as a candidate for a separately labelled metadata layer, subject to a bounded read-only API integration test. Before enabling scheduled ingestion, verify pagination, response envelopes, object identifiers, update timestamps, practical response size and attribution requirements against the live schema. Preserve provider data separately from CelesTrak/OrbitalWiki; do not treat transmitter metadata as evidence that a satellite is operational or that a telecommunications service depends on it. No API write endpoints will be used.
 
 ### ESA DISCOSweb
 Portal: https://discosweb.esoc.esa.int/  
