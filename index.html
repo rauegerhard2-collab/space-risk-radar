@@ -23,6 +23,7 @@ footer{margin:22px 0 0;padding:20px 0 30px;border-top:1px solid var(--line);colo
 @media(max-width:600px){.shell{padding:0 15px}.topmeta{display:none}.hero{padding-top:30px}.kpis{gap:8px}.kpi{padding:13px}.panel{padding:15px}.split{grid-template-columns:1fr}.timeline{grid-template-columns:1fr}.quality{grid-template-columns:1fr}.sources{grid-template-columns:1fr}.orbital svg{height:240px}.orbital{min-height:275px}}
 
 /* v1.2 interactions */
+.metricline[role="button"]{border-radius:6px;padding-left:8px;padding-right:8px;margin-left:-8px;margin-right:-8px}.source-detail{margin-top:9px;border:1px solid var(--line);background:#111d30;color:var(--cyan);border-radius:6px;padding:6px 9px;font:inherit;font-size:10px;cursor:pointer}.source-detail:hover{border-color:var(--cyan);color:#fff}
 .kpi[role="button"],.timeitem[role="button"],.metricline[role="button"],.source[role="button"]{cursor:pointer;transition:border-color .18s,transform .18s}
 .kpi[role="button"]:hover,.timeitem[role="button"]:hover,.metricline[role="button"]:hover,.source[role="button"]:hover{border-color:var(--cyan);transform:translateY(-1px)}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
@@ -75,11 +76,11 @@ footer{margin:22px 0 0;padding:20px 0 30px;border-top:1px solid var(--line);colo
 </div>
 <div class="split">
 <section class="panel" id="watch"><div class="section-kicker">03 / Collision & conjunction watch</div><h2>Annäherung ist nicht gleich Kollision</h2><p class="sub">Öffentliche Warnmeldungen bilden nur einen Ausschnitt der operativen Lage ab. Eine belastbare globale Statistik tatsächlich ausgeführter Ausweichmanöver lässt sich daraus nicht ableiten.</p>
-<div class="metricline"><span>1 · Conjunction warning</span><b><span class="badge amber">Prognostizierte Annäherung</span></b></div><div class="metricline"><span>2 · Risk assessment</span><b><span class="badge">Betreiberprüfung</span></b></div><div class="metricline"><span>3 · Avoidance manoeuvre</span><b><span class="badge pink">Ausgeführte Kursänderung</span></b></div>
+<div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Conjunction warning – prognostizierte Annäherung" data-detail="Ein Conjunction Data Message (CDM) beschreibt eine berechnete Annäherung zweier Objekte. Es ist zunächst eine Warn- bzw. Screening-Information, keine bestätigte Kollision. Die Aussage hängt unter anderem von Bahndaten, deren Unsicherheit und dem betrachteten Zeitfenster ab."><span>1 · Conjunction warning</span><b><span class="badge amber">Prognostizierte Annäherung</span></b></div><div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Risk assessment – Betreiberprüfung" data-detail="Der Betreiber bewertet die Annäherung anhand aktueller Bahndaten, Kollisionswahrscheinlichkeit, Miss-Distance, Unsicherheitskovarianzen, Missionsanforderungen und verfügbarer Optionen. Schwellenwerte und Prozesse unterscheiden sich zwischen Betreibern."><span>2 · Risk assessment</span><b><span class="badge">Betreiberprüfung</span></b></div><div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Avoidance manoeuvre – ausgeführte Kursänderung" data-detail="Ein Ausweichmanöver ist eine tatsächlich geplante und ausgeführte Bahnänderung. Eine Warnung oder Risikoprüfung belegt für sich allein nicht, dass ein Manöver stattgefunden hat. Öffentlich zugängliche Daten dazu sind lückenhaft."><span>3 · Avoidance manoeuvre</span><b><span class="badge pink">Ausgeführte Kursänderung</span></b></div>
 <div class="insight"><strong>Warum keine Live-Warnliste?</strong><p>Öffentliche Anbieter decken unterschiedliche Objektgruppen und Zeitfenster ab. Ohne einheitliche Ereignis-IDs, Aktualisierungszeiten und Qualitätsprüfung wäre eine gemeinsame Liste irreführend.</p></div>
 <p style="margin:14px 0 0"><a href="https://orbitalwatch.app/collision-watch" target="_blank" rel="noopener">Orbital Watch – öffentliche Collision Watch ↗</a><br><a href="https://www.esa.int/Space_Safety/Space_Debris/Reentry_and_collision_avoidance" target="_blank" rel="noopener">ESA – Re-entry and collision avoidance ↗</a></p></section>
 <section class="panel" id="context"><div class="section-kicker">04 / Context & implications</div><h2>Was die Kennzahlen aussagen – und was nicht</h2>
-<div class="metricline"><span>Wachstum des katalogisierten Bestands</span><b>Mehr Objekte erfasst</b></div><div class="metricline"><span>Modellierte Kleinsttrümmer</span><b>Statistische Schätzung</b></div><div class="metricline"><span>Konkrete Dienstunterbrechung</span><b>Nicht daraus ableitbar</b></div><div class="metricline"><span>Globale Manöveraktivität</span><b>Öffentlich unvollständig</b></div>
+<div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Wachstum des katalogisierten Bestands" data-detail="Ein steigender Katalogbestand kann reale Zunahme, verbesserte Sensorik, bessere Auswertung und neu identifizierte Objekte widerspiegeln. Er ist deshalb nicht ohne Weiteres eine reine Wachstumsrate der physischen Population."><span>Wachstum des katalogisierten Bestands</span><b>Mehr Objekte erfasst</b></div><div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Modellierte Kleinsttrümmer" data-detail="Kleine Fragmente sind nicht vollständig einzeln katalogisierbar. Populationsmodelle schätzen ihre Anzahl statistisch; Ergebnis und Unsicherheit hängen von Modell, Größenklasse und Referenzdatum ab."><span>Modellierte Kleinsttrümmer</span><b>Statistische Schätzung</b></div><div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Konkrete Dienstunterbrechung" data-detail="Aus globalen Trümmerzahlen allein lässt sich kein Ausfall eines Telekommunikationsdienstes ableiten. Dafür wären konkrete Satelliten, Orbits, Abhängigkeiten, Bodeninfrastruktur und alternative Dienstpfade zu untersuchen."><span>Konkrete Dienstunterbrechung</span><b>Nicht daraus ableitbar</b></div><div class="metricline" role="button" tabindex="0" aria-haspopup="dialog" data-title="Globale Manöveraktivität" data-detail="Es gibt keine vollständige, einheitliche öffentliche Datenbasis aller Kollisionswarnungen und ausgeführten Ausweichmanöver. Fehlende Daten dürfen nicht als Nullereignisse interpretiert werden."><span>Globale Manöveraktivität</span><b>Öffentlich unvollständig</b></div>
 <p class="sub" style="margin-top:12px">Für Kommunikations- und andere kritische Dienste sind zusätzlich konkrete Satelliten, genutzte Orbits, Anbieter, Bodenstationen und alternative Dienstpfade zuzuordnen. Globale Trümmerzahlen allein belegen keinen konkreten Ausfall.</p></section>
 </div>
 <section class="panel" style="margin-top:14px"><div class="panel-head"><div><div class="section-kicker">05 / Timeline</div><h2>Jüngste belastbare Berichtslage</h2><div class="sub">Berichtsbezug und Stichtage bewusst getrennt</div></div></div>
@@ -116,7 +117,7 @@ document.getElementById("dialog-close").addEventListener("click",()=>detailDialo
 detailDialog.addEventListener("click",e=>{if(e.target===detailDialog)detailDialog.close()});
 document.addEventListener("click",e=>{
  const target=e.target.closest("[data-detail]");
- if(target)openDetail(target.dataset.title||"Einordnung",target.dataset.detail);
+ if(target)openDetail(target.dataset.title||"Einordnung",target.dataset.detail,target.dataset.source||"Dashboard · Einordnung und Quellen siehe Quellenregister");
 });
 document.addEventListener("keydown",e=>{
  if((e.key==="Enter"||e.key===" ")&&e.target.matches('[data-detail][role="button"]')){e.preventDefault();openDetail(e.target.dataset.title||"Einordnung",e.target.dataset.detail)}
@@ -125,6 +126,18 @@ document.querySelectorAll("[data-layer]").forEach(input=>input.addEventListener(
  const layer=input.dataset.layer,visible=input.checked;
  document.querySelectorAll('[data-orbit-layer="'+layer+'"]').forEach(el=>el.style.display=visible?"":"none");
 }));
+
+
+document.querySelectorAll(".source").forEach(card=>{
+ const link=card.querySelector("a"),description=card.querySelector("p");
+ if(!link||!description)return;
+ const button=document.createElement("button");
+ button.type="button";button.className="source-detail";button.textContent="Quellenhinweise & Grenzen";
+ button.dataset.title=link.textContent.replace(" ↗","");
+ button.dataset.detail=description.textContent+" Die verlinkte Quelle ist der externe Einstiegspunkt. Bitte Veröffentlichungsdatum, Datenstichtag, Definition und eventuelle Modellannahmen direkt dort prüfen.";
+ button.setAttribute("aria-haspopup","dialog");
+ card.append(button);
+});
 
 function node(tag,attrs={},text=""){const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text)n.textContent=text;return n}
 function render(key){const d=series[key],W=600,H=250,L=74,R=18,T=18,B=42,iw=W-L-R,ih=H-T-B;svg.replaceChildren();
