@@ -98,6 +98,7 @@ footer{margin:22px 0 0;padding:20px 0 30px;border-top:1px solid var(--line);colo
 </section>
 <footer><span>SPACE RISK RADAR · Public information prototype · Interactive preview v1.2</span><span>Stand: 03.11.2026 · Unabhängiges Projekt · Keine offizielle ESA- oder DTAG-Veröffentlichung</span></footer>
 </div>
+<dialog id="detail-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title">Detail</h2><button class="dialog-close" type="button" id="dialog-close" aria-label="Detailansicht schließen">Schließen ✕</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
 <script>
 const series={
 tracked:{max:50000,points:[{year:2024,value:35000,label:"ESA-Bericht 2024",detail:"Berichtsbezug 2023 · rund 35.000"},{year:2025,value:40000,label:"ESA-Bericht 2025",detail:"Berichtsdaten bis Ende 2024 · rund 40.000 (historischer Snapshot)"},{year:2026,value:47280,label:"ESA-Portal",detail:"02.11.2026 · rund 47.280"}],note:"Katalogisierte Objekte, nicht identisch mit der modellierten Gesamtpopulation. Historische Werte sind gerundete Berichtssnapshots."},
@@ -148,5 +149,5 @@ document.getElementById("chart-note").textContent=d.note}
 document.querySelectorAll("#chart-controls button").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll("#chart-controls button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");render(btn.dataset.key)}));render("tracked");
 </script>
 
-<dialog id="detail-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title">Detail</h2><button class="dialog-close" type="button" id="dialog-close" aria-label="Detailansicht schließen">Schließen ✕</button></div><div class="dialog-body" id="dialog-body"></div></dialog>
+
 </body></html>
