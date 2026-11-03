@@ -1,0 +1,32 @@
+name: Validate dashboard and data
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: ["feature/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate dashboard and metric data
+        run: python scripts/validate_data.py
+      - name: Parse orbital snapshots when present
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path("data/orbital").rglob("*.json"):
+              obj = json.loads(path.read_text(encoding="utf-8"))
+              if not isinstance(obj, dict):
+                  raise SystemExit(f"Invalid snapshot: {path}")
+              if "objects" in obj and not isinstance(obj["objects"], list):
+                  raise SystemExit(f"Invalid objects array: {path}")
+          print("Orbital JSON files parse successfully.")
+          PY
