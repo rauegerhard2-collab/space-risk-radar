@@ -2,30 +2,56 @@
 
 Reviewed: 3 November 2026
 
-## CelesTrak GP API — selected for the first ingestion pilot
+## CelesTrak GP API — primary orbital-element feed
 
 Official documentation: https://celestrak.org/NORAD/documentation/gp-data-formats.php  
 Usage policy: https://celestrak.org/usage-policy.php
 
-CelesTrak publishes general perturbations/orbital element sets in CCSDS OMM-compatible JSON, CSV, XML and KVN, alongside legacy TLE formats. OMM is the preferred format for forward compatibility with catalog numbers beyond five digits. The API supports curated groups, including STATIONS, and documents that data is checked/updated on a two-hour cycle. Its usage policy asks clients to retrieve only what they need and not poll more frequently than the update cadence.
+CelesTrak publishes general perturbations/orbital element sets in CCSDS OMM-compatible JSON, CSV, XML and KVN. OMM is preferred for forward compatibility with catalog numbers beyond five digits. The automated pilot retrieves only the STATIONS group once daily and preserves the records unchanged with a UTC retrieval timestamp and per-object epoch.
 
-**Decision:** begin with one daily STATIONS-group JSON retrieval. Preserve the source OMM records unchanged with a UTC retrieval timestamp and per-object epoch. Do not poll the full active catalogue, do not query every satellite individually, and stop on non-200 responses. This is an ingestion pilot, not an operational safety feed.
+**Decision:** required primary feed. This is a limited group, not a global catalogue, collision-warning feed or manoeuvre register.
 
-## ESA DISCOSweb — valuable metadata, access conditions to resolve
+## OrbitalWiki API — complementary catalogue events and launch metadata
 
-Official portal: https://discosweb.esoc.esa.int/
+Developer documentation: https://www.orbitalwiki.com/developers  
+API quickstart: https://www.orbitalwiki.com/developers/quickstart  
+Sources and licence register: https://www.orbitalwiki.com/sources  
+Terms: https://www.orbitalwiki.com/terms
 
-DISCOS provides reference information about launches, object registration, spacecraft characteristics and fragmentation context. ESA states that users register and accept the DISCOSweb terms; orbital/attitude ephemerides from surveillance systems are not distributed through DISCOSweb. ESA also requires source acknowledgement when data are used in derived works or redistributed.
+OrbitalWiki documents public, read-only endpoints for catalogue events and launch records that do not require an API key. The ingestion workflow now retrieves:
+- `/api/v1/events` — catalogue changes such as first appearances, recorded re-entries and significant orbit changes.
+- `/api/v1/launches` — launch metadata and associated catalogue object counts.
 
-**Decision:** use as a potential metadata enrichment source after account registration and review of current terms/API version. Do not treat it as a source of live orbital positions or conjunction warnings.
+The API's orbital-elements endpoint is deliberately not ingested: OrbitalWiki says its elements are sourced from CelesTrak, so using both as orbital-element feeds would duplicate upstream data rather than provide an independent observation. OrbitalWiki is an early-access service; endpoint availability and schemas may change. The workflow validates that responses are non-empty JSON, preserves the raw payload and records source/time. Optional-feed failures are logged without invalidating the primary CelesTrak snapshot.
 
-## Space-Track — authoritative but account-governed
+OrbitalWiki describes its reconciled database as ODbL-1.0 and identifies upstream source terms separately. Attribution is retained in each archived envelope. Its public catalogue is useful enrichment, not an independent space-surveillance sensor or operational safety source.
 
-Documentation: https://www.space-track.org/documentation
+## Orbital Watch — public conjunction information, not yet an automated feed
 
-Space-Track provides API access to GP/OMM, catalogue, decay and conjunction data-message classes, with explicit rate limits and data retrieval rules. Its documentation gives separate limits for GP, CDM, SATCAT and other classes.
+Collision Watch: https://orbitalwatch.app/collision-watch
 
-**Decision:** do not automate against it until a project-owned account, credentials handling, applicable terms, redistribution rights and intended CDM use have been reviewed. Credentials must never be committed to this public repository. Do not present CDMs as a complete public global record of operator decisions or manoeuvres.
+Orbital Watch publishes a public selected subset of conjunction information sourced from the Space-Track public CDM catalogue and states that it refreshes three times daily. It also explicitly warns that the public subset is not comprehensive because some operator data are not released and some probability values may be rounded.
+
+**Decision:** include as a reviewed public reference and manual cross-check, but do not scrape its HTML. No stable, documented machine-readable export/API contract was established for this integration. Scraping a changing presentation page would risk silently changing field meanings, missing records or duplicating Space-Track CDMs. Revisit if the provider publishes a supported API or export schema.
+
+## Other candidates
+
+### SatNOGS DB
+API documentation: https://docs.satnogs.org/projects/satnogs-db/en/latest/api.html  
+Live API schema: https://db.satnogs.org/api/schema/docs/  
+About / data terms: https://db.satnogs.org/about/
+
+SatNOGS DB provides a public read API for community-maintained satellite and transmitter metadata. Its own documentation says API data are freely distributed under CC BY-SA; the project description identifies the data as volunteer-contributed. This is useful for radio-frequency/transponder enrichment, not a source of precise orbital ephemerides or conjunction warnings.
+
+**Decision:** approved as a candidate for a separately labelled metadata layer, subject to a bounded read-only API integration test. Before enabling scheduled ingestion, verify pagination, response envelopes, object identifiers, update timestamps, practical response size and attribution requirements against the live schema. Preserve provider data separately from CelesTrak/OrbitalWiki; do not treat transmitter metadata as evidence that a satellite is operational or that a telecommunications service depends on it. No API write endpoints will be used.
+
+### ESA DISCOSweb
+Portal: https://discosweb.esoc.esa.int/  
+ESA DISCOS is valuable for object identity, launch and spacecraft metadata. Registration and acceptance of current terms are required; ESA states that surveillance orbital/attitude ephemerides are not distributed through DISCOSweb. Source acknowledgement is required for derived works or redistribution. Not yet automated.
+
+### Space-Track
+Documentation: https://www.space-track.org/documentation  
+Space-Track provides GP/OMM, catalogue, decay and CDM classes, with explicit rate limits and retrieval rules. CDM access and redistribution need a project-owned account, credentials handling and terms review. Credentials must never be committed to this public repository. A public Orbital Watch page is not a substitute for direct permission or a complete CDM archive.
 
 ## Collision-warning data limitations
 

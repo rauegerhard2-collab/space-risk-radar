@@ -1,15 +1,15 @@
 # Orbital data archive
 
-The first automated orbital dataset is deliberately limited to CelesTrak's **STATIONS** group. It is a manageable, clearly defined sample for validating OMM ingestion and historical archiving; it is not a complete catalogue or a representative sample of all orbital traffic.
+The archive now separates orbital elements from catalogue enrichment:
 
-- Source: https://celestrak.org/NORAD/documentation/gp-data-formats.php
-- Endpoint: CelesTrak GP API, GROUP=STATIONS, FORMAT=JSON
-- Format: CCSDS Orbit Mean-Elements Message (OMM) JSON
-- Schedule: once daily at 07:17 UTC, with manual workflow dispatch available
-- Archive: one immutable date-stamped file per successful run under `snapshots/`
-- Latest copy: `latest.json`
-- Provenance: each file records retrieval time, source URL, group, record count and per-object OMM epoch
+- **CelesTrak STATIONS:** daily CCSDS OMM JSON snapshot, stored unchanged under `snapshots/` plus `latest.json`. This is a limited station group, not a global catalogue.
+- **OrbitalWiki events:** optional daily catalogue-change snapshot under `orbitalwiki-events/`. Events are catalogue changes, not conjunction warnings or manoeuvres.
+- **OrbitalWiki launches:** optional daily launch metadata snapshot under `orbitalwiki-launches/`. Launch records are not orbital ephemerides.
 
-The archive records orbital elements, not collision warnings. It does not compute conjunction probabilities or avoidance manoeuvres. OMM epochs are object-specific and must be checked before any propagation. A future map must label its data time and freshness, and must not call this limited station group a live global picture.
+Each successful file includes source URL, UTC retrieval time and attribution. The source log records success or optional-feed failure. CelesTrak is required: if it fails or returns malformed data, the workflow stops without replacing the primary snapshot. OrbitalWiki is optional: an unavailable feed is logged and does not discard a valid CelesTrak snapshot.
 
-The updater makes one request per scheduled run. It stops on HTTP errors, empty responses or missing required fields; it does not overwrite data with an invalid response.
+OrbitalWiki's orbital elements are sourced from CelesTrak, so the project intentionally does not ingest its `/elements` endpoint as a second orbital feed. Its API is early access; payloads are preserved as returned, and schema changes may require code updates. ODbL-1.0 attribution is retained; upstream sources retain their own terms.
+
+Orbital Watch Collision Watch is currently a public human-readable CDM reference, not an automated feed. The project does not scrape its HTML. No orbital-element snapshot by itself is a collision warning, collision probability or evidence of an executed avoidance manoeuvre.
+
+The updater runs once daily at 07:17 UTC and can be started manually. It follows the branch on which the workflow was dispatched; it no longer pushes to the retired `feature/dashboard-v1-1` branch.

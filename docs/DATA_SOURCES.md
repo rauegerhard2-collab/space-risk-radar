@@ -16,42 +16,34 @@ Headline indicators shown by the portal:
 
 ### Source discrepancy
 
-The same portal's detailed table, "Current number of orbiting objects per type and orbital regime", reports a total of 47,290, while the headline summary reports about 47,280. The dashboard currently displays the headline summary (47,280) and retains this discrepancy in the project data. Do not treat the two values as interchangeable or imply a precision that the portal itself does not provide.
+The same portal's detailed table reports 47,290, while the headline summary reports about 47,280. The dashboard displays the headline summary and retains this discrepancy. Do not silently reconcile the two values.
 
 ### Interpretation
 
-- "Catalogued" means objects whose orbital elements are maintained for prolonged periods in a space-surveillance catalogue.
-- MASTER-8 population figures are statistical model estimates, not directly catalogued object counts.
-- The 1–10 cm and 1 mm–1 cm populations are estimates, not individually observed inventories.
-- "More than 660" is a cumulative count of events resulting in fragmentation, not an annual event rate.
+Catalogue counts, modelled populations and cumulative fragmentation events are different measures. MASTER-8 figures are model estimates, not directly catalogued counts. "More than 660" is cumulative, not an annual rate.
 
 ## ESA Space Environment Report 2026
 
 URL: https://www.esa.int/Space_Safety/Space_Debris/ESA_Space_Environment_Report_2026  
-Original report PDF: https://www.sdo.esoc.esa.int/publications/Space_Environment_Report_I10R0_20260501.pdf
+PDF: https://www.sdo.esoc.esa.int/publications/Space_Environment_Report_I10R0_20260501.pdf
 
-The 2026 report is the tenth edition and was released on 1 May 2026. It describes the environment using data through the end of 2025 and includes model-based future-environment analysis. A report publication date must not be mistaken for a real-time data cut-off.
+Released 1 May 2026; data through end 2025. Publication date is not the data cut-off.
 
-## Public conjunction information
+## Automated orbital and catalogue feeds
 
-Orbital Watch Collision Watch: https://orbitalwatch.app/collision-watch
+See [Feed assessment](FEED_ASSESSMENT.md) and [orbital archive notes](../data/orbital/README.md).
 
-This is a public information source for selected conjunction-related information. It is not a complete global record of all warnings, operator decisions or executed manoeuvres. Coverage, update times, event identity and definitions must be assessed before records are aggregated.
+- **CelesTrak GP API:** required daily STATIONS OMM pilot. Orbital elements only; not collision alerts or manoeuvre records.
+- **OrbitalWiki API:** optional daily catalogue-events and launch metadata snapshots. Its orbital elements are sourced from CelesTrak and are not ingested as a second independent orbital feed. ODbL attribution and upstream terms are recorded.
+- **Orbital Watch Collision Watch:** public selected CDM-based conjunction reference, refreshed three times daily according to its page. Not automatically scraped; no stable documented public export/API contract was established.
+- **SatNOGS DB:** candidate for radio/transmitter metadata under CC BY-SA 4.0.
+- **ESA DISCOSweb / Space-Track:** require further account, terms, rate-limit and redistribution review before automation.
 
 ## Data labels
 
 - **OBSERVED / CATALOGUED:** measured, tracked or listed in a surveillance catalogue. Include epoch, catalogue/source and definition.
 - **MODELLED:** estimated from a statistical or physical model. Include model version, size threshold and reference population date.
 - **DERIVED:** calculated from other values. Document formula, input records and uncertainty.
-- **REPORTED:** an event or statement published by an identified source but not independently verified by this project.
+- **REPORTED:** published by an identified source but not independently verified by this project.
 
-## Minimum record fields for future ingestion
-
-`metric_id`, `value`, `unit`, `classification`, `reference_date`, `published_date`, `retrieved_at`, `source_name`, `source_url`, `definition`, `uncertainty_note`, `verification_status`.
-
-No missing month may be filled by interpolation unless a future analytical product explicitly labels such a transformation and explains its method. The default dashboard must show gaps as gaps.
-
-
-## Orbital element sources
-
-See [Feed assessment](FEED_ASSESSMENT.md). The initial automated pilot uses one daily CelesTrak STATIONS-group OMM JSON snapshot. It is a limited object group, not a global catalogue. See [orbital archive notes](../data/orbital/README.md). ESA DISCOS is considered for metadata only after registration and terms review; it does not distribute surveillance ephemerides. Space-Track CDM/API access requires separate account, rate-limit and redistribution review.
+Every maintained dataset must retain source URL, retrieval time, reference date, definition, uncertainty and verification status. Missing months remain gaps; no interpolation by default.
