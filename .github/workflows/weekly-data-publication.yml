@@ -1,0 +1,96 @@
+name: Weekly validated data publication
+
+on:
+  schedule:
+    - cron: "30 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: space-risk-radar-production-weekly-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Load only the staged data files
+        run: |
+          git fetch origin data-staging
+          git checkout origin/data-staging -- \
+            data/source-log.jsonl \
+            data/orbit-distribution/latest.json \
+            data/orbital/latest.json \
+            data/orbital/orbitalwiki-events/latest.json \
+            data/orbital/orbitalwiki-launches/latest.json
+
+      - name: Run orbit-distribution self-test
+        run: python scripts/build_orbit_distribution.py --check
+
+      - name: Compile publication validator
+        run: python -m py_compile scripts/validate_publication.py
+
+      - name: Validate all four feeds before publication
+        run: python scripts/validate_publication.py --max-age-hours 48
+
+      - name: Publish validated data to production main
+        id: publish
+        run: |
+          git add \
+            data/source-log.jsonl \
+            data/orbit-distribution/latest.json \
+            data/orbital/latest.json \
+            data/orbital/orbitalwiki-events/latest.json \
+            data/orbital/orbitalwiki-launches/latest.json
+          if git diff --cached --quiet; then
+            echo "No new staged data; production data remains unchanged."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publish validated weekly orbital data"
+          git push origin main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify production GitHub Pages content
+        env:
+          SITE_URL: https://rauegerhard2-collab.github.io/space-risk-radar
+        run: |
+          expected=$(python -c 'import json; print(json.load(open("data/orbit-distribution/latest.json", encoding="utf-8"))["retrieved_at_utc"])')
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 20 "$SITE_URL/data/orbit-distribution/latest.json?nocache=$(date +%s)" -o /tmp/published-orbit.json \
+              && curl -fsS --max-time 20 "$SITE_URL/?nocache=$(date +%s)" -o /tmp/published-index.html; then
+              if python - "$expected" <<'PY'
+          import json, sys
+          from pathlib import Path
+          expected = sys.argv[1]
+          published = json.loads(Path("/tmp/published-orbit.json").read_text(encoding="utf-8"))
+          html = Path("/tmp/published-index.html").read_text(encoding="utf-8")
+          if published.get("retrieved_at_utc") != expected:
+              raise SystemExit("Live Pages orbit snapshot has not reached the validated retrieval timestamp yet.")
+          if 'id="site-data-as-of"' not in html:
+              raise SystemExit("Live Pages homepage does not contain the data-date indicator.")
+          PY
+              then
+                echo "Production Pages serves the validated orbit snapshot and dynamic data-date indicator."
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for the production Pages branch deployment." >&2
+          exit 1

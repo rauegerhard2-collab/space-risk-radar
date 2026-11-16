@@ -1,15 +1,16 @@
-# Orbital data archive
+# Orbital data snapshots
 
-The first automated orbital dataset is deliberately limited to CelesTrak's **STATIONS** group. It is a manageable, clearly defined sample for validating OMM ingestion and historical archiving; it is not a complete catalogue or a representative sample of all orbital traffic.
+The production main branch publishes a small, explicitly scoped set of current public snapshots:
 
-- Source: https://celestrak.org/NORAD/documentation/gp-data-formats.php
-- Endpoint: CelesTrak GP API, GROUP=STATIONS, FORMAT=JSON
-- Format: CCSDS Orbit Mean-Elements Message (OMM) JSON
-- Schedule: once daily at 07:17 UTC, with manual workflow dispatch available
-- Archive: one immutable date-stamped file per successful run under `snapshots/`
-- Latest copy: `latest.json`
-- Provenance: each file records retrieval time, source URL, group, record count and per-object OMM epoch
+- CelesTrak ACTIVE: provider-defined subset used to calculate approximate orbit-regime counts; not a complete object catalogue or collision-risk feed.
+- CelesTrak STATIONS: selected station-group OMM records, not a global satellite/debris catalogue.
+- OrbitalWiki events: recent catalogue-change metadata; its history is limited and is not a conjunction-warning or manoeuvre feed.
+- OrbitalWiki launches: catalogue metadata derived from object designators; not orbital ephemerides.
 
-The archive records orbital elements, not collision warnings. It does not compute conjunction probabilities or avoidance manoeuvres. OMM epochs are object-specific and must be checked before any propagation. A future map must label its data time and freshness, and must not call this limited station group a live global picture.
+Daily retrievals are committed to the isolated data-staging branch. A weekly quality gate copies only valid, recent snapshots and the source log to main. A failed feed is logged and cannot overwrite its last-known-good snapshot or be published as part of a partial weekly release.
 
-The updater makes one request per scheduled run. It stops on HTTP errors, empty responses or missing required fields; it does not overwrite data with an invalid response.
+Every snapshot carries a UTC retrieval timestamp distinct from provider-generated times and per-object OMM epochs. The source log records the actual retrieval time, record count and result for each maintained feed.
+
+The existing dated archive and its earlier feature-branch ingestion pilot are retained as historical development material. They are not the publication mechanism for the production site.
+
+These data are for public-information and situational-awareness context only. They are not operational conjunction assessments, collision warnings, confirmed avoidance manoeuvres or indicators of service impact.
