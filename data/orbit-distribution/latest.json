@@ -2,18 +2,18 @@
   "schema_version": 1,
   "source": "CelesTrak GP/OMM ACTIVE group",
   "source_url": "https://celestrak.org/NORAD/elements/gp.php?GROUP=ACTIVE&FORMAT=JSON",
-  "retrieved_at_utc": "2026-11-22T07:19:04.872766Z",
+  "retrieved_at_utc": "2026-11-23T07:44:11.211644Z",
   "source_epoch_min_utc": "2026-11-02T06:44:40.507296Z",
-  "source_epoch_max_utc": "2026-11-22T05:36:13.201632Z",
+  "source_epoch_max_utc": "2026-11-23T03:38:21.853248Z",
   "raw_source_epoch_max_utc": "2026-11-24T01:03:00.298944Z",
   "scope": "Records returned by the CelesTrak ACTIVE group that pass the source-epoch quality gate; not a complete global catalogue.",
-  "raw_record_count": 16912,
-  "record_count": 16910,
-  "classified_count": 16910,
+  "raw_record_count": 16904,
+  "record_count": 16903,
+  "classified_count": 16903,
   "quality": {
     "future_epoch_tolerance_hours": 6,
     "stale_epoch_threshold_days": 30,
-    "excluded_future_epoch_count": 2,
+    "excluded_future_epoch_count": 1,
     "missing_or_invalid_epoch_count": 0,
     "stale_epoch_count": 0,
     "epoch_gate": "Records with no parseable EPOCH or an EPOCH more than 6 hours after retrieval are excluded from the distribution."
@@ -27,10 +27,10 @@
     "unclassified": "required or physically plausible orbital elements unavailable"
   },
   "counts": {
-    "leo": 16113,
+    "leo": 16107,
     "meo": 176,
-    "geo_like": 578,
-    "heo_or_crossing": 43,
+    "geo_like": 576,
+    "heo_or_crossing": 44,
     "above_geo": 0,
     "unclassified": 0
   },
